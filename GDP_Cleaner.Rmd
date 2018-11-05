@@ -1,0 +1,35 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(reshape2)
+```
+
+```{r}
+gdp <- read_excel("TED_1_MAR20181.xlsx", 
+    sheet = "TCB_ADJUSTED", skip = 3)
+```
+
+```{r}
+gdp <- gdp[gdp$INDICATOR == "GDP EKS",]
+gdp <- gdp[gdp$COUNTRY != "China (Official)",]
+gdp <- melt(gdp, variable.name = "YEAR")
+gdp <- gdp %>% select(everything()) %>% arrange_all(.vars = c("REGION", "COUNTRY", "YEAR"))
+```
+
+```{r}
+ggplot(gdp, aes(x = variable, y = value, group = COUNTRY)) + geom_line(aes(color = COUNTRY)) + 
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r}
+write_csv(gdp, "Tidy_GDP.csv")
+jsonlite::toJSON()
+```
+
